@@ -1,0 +1,1 @@
+go_build_gostock_c.exe sz000002 sh601789 sz000034 sh601318

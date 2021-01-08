@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type stock struct {
@@ -19,8 +22,8 @@ type stock struct {
 	zhangdielv   float64
 }
 
-func Newstock(stockcode string) (s *stock){
-	s =&stock{
+func Newstock(stockcode string) (s *stock) {
+	s = &stock{
 		stockcode: stockcode,
 	}
 	return s
@@ -29,6 +32,11 @@ func Newstock(stockcode string) (s *stock){
 func (si *stock) getReal() {
 
 	sl := getinfo(si.stockcode)
+
+	if len(sl) == 1 {
+		fmt.Println("stock code ", si.stockcode, "get wrong ")
+		return
+	}
 
 	si.stockname = sl[0]
 	si.jinrikaipan, _ = strconv.ParseFloat(sl[1], 64)
@@ -50,5 +58,22 @@ func (si *stock) getReal() {
 	fmt.Printf("%s %s %s 当前涨跌方向:%s 涨跌:%v%% 当前价格:%v 开盘价格:%v 今日最高:%v 今日最低:%v \n",
 		si.riqi, si.shijian, si.stockname, si.zhangdie, strconv.FormatFloat(si.zhangdielv, 'f', 2, 64),
 		si.dangqianjia, si.jinrikaipan, si.jinrizuigao, si.jinrizuidi)
+
+}
+
+func gostock() {
+	/*s  := "sz000002"  "sh601789"*/
+
+	for i := 1; i < len(os.Args); i++ {
+		s := Newstock(strings.ToLower(os.Args[i]))
+		go func(s stock) {
+			for {
+				s.getReal()
+				select {
+				case <-time.NewTimer(10 * 1000 * time.Millisecond).C:
+				}
+			}
+		}(*s)
+	}
 
 }
